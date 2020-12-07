@@ -19,9 +19,9 @@ The following are some examples to illustrate how after can be useful (or not).
 
 Notify yourself when your build is done:
 
-	$ after -p 2027 -e "build is done!"
+	$ after -n gcc -e "build is done!"
 
 Put your machine to sleep after your updates are complete:
 
-	$ after -n pkg_add -e "doas zzz" | sh
+	$ after -p 2027 -e "doas zzz" | sh
 
