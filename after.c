@@ -48,7 +48,8 @@ pname_is_in(char *pname, struct kinfo_proc **kinfo, int entries)
 }
 
 struct kinfo_proc **
-get_proc_list(kvm_t *kd, int *entries) {
+get_proc_list(kvm_t *kd, int *entries)
+{
 	int i;
 	struct kinfo_proc *kp, **kinfo;
 
@@ -98,11 +99,18 @@ main(int argc, char *argv[])
 			usage();
 			exit(1);
 		}
+
 	argc -= optind;
 	argv += optind;
 
 	// show usage if neither a pid nor a pname are given
 	if (!(pname != NULL || pid != 0)) {
+		usage();
+		exit(1);
+	}
+
+	// show usage if no output string is given
+	if (cmd == NULL) {
 		usage();
 		exit(1);
 	}
@@ -116,7 +124,7 @@ main(int argc, char *argv[])
 	// get initial process list
 	kinfo = get_proc_list(kd, &entries);
 
-	// if a process name is given
+	// if a process name is given use that, otherwise use pid
 	if (pname != NULL) {
 		while(pname_is_in(pname, kinfo, entries) == 0) {
 			kinfo = get_proc_list(kd, &entries);
@@ -135,7 +143,7 @@ main(int argc, char *argv[])
 	}
 
 	if (verbose == 1)
-		fprintf(stderr, "%s: process not in process list.\n", prog_name);
+		fprintf(stderr, "%s: process not in process list (died?).\n", prog_name);
 
 	printf("%s\n", cmd);
 
