@@ -1,28 +1,19 @@
-#include <sys/param.h>	/* MAXCOMLEN NODEV */
 #include <sys/types.h>
 #include <sys/sysctl.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <sys/proc.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
 
 #include <err.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <kvm.h>
-#include <locale.h>
-#include <nlist.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
 
-static void
-usage(void)
+void
+usage(char *progname)
 {
-	printf("usage: after [-h] [-v] [-p pid | -n process_name] -e string\n");
+	printf("usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n", progname);
 }
 
 int
@@ -67,15 +58,17 @@ get_proc_list(kvm_t *kd, int *entries)
 	return kinfo;
 }
 
-int 
+int
 main(int argc, char *argv[])
 {
-	int i, ch, entries, verbose = 0, pid = 0;
-	char *prog_name = argv[0], *pname = NULL, *cmd = NULL;
+	int i, ch, entries;
+	int verbose = 0, pid = 0;
+	char *progname = argv[0], 
+	char *pname = NULL, *cmd = NULL;
 	char errbuf[_POSIX2_LINE_MAX];
 
-	struct kinfo_proc **kinfo;
 	kvm_t *kd;
+	struct kinfo_proc **kinfo;
 
 	// argument parsing...
 	while((ch = getopt(argc, argv, "hn:p:ve:")) != -1)
@@ -93,25 +86,22 @@ main(int argc, char *argv[])
 			verbose = 1;
 			break;
 		case 'h':
-			usage();
+			usage(progname);
 			return 0;
 		default:
-			usage();
+			usage(progname);
 			exit(1);
 		}
 
-	argc -= optind;
-	argv += optind;
-
+	// argument checking...
 	// show usage if neither a pid nor a pname are given
 	if (!(pname != NULL || pid != 0)) {
-		usage();
+		usage(progname);
 		exit(1);
 	}
-
 	// show usage if no output string is given
 	if (cmd == NULL) {
-		usage();
+		usage(progname);
 		exit(1);
 	}
 
@@ -129,7 +119,7 @@ main(int argc, char *argv[])
 		while(pname_is_in(pname, kinfo, entries) == 0) {
 			kinfo = get_proc_list(kd, &entries);
 			if (verbose == 1)
-				fprintf(stderr, "%s: waiting...\n", prog_name);
+				fprintf(stderr, "%s: waiting...\n", progname);
 			sleep(1);
 		}
 	}
@@ -137,14 +127,13 @@ main(int argc, char *argv[])
 		while(pid_is_in(pid, kinfo, entries) == 0) {
 			kinfo = get_proc_list(kd, &entries);
 			if (verbose == 1)
-				fprintf(stderr, "%s: waiting...\n", prog_name);
+				fprintf(stderr, "%s: waiting...\n", progname);
 			sleep(1);
 		}
 	}
 
 	if (verbose == 1)
-		fprintf(stderr, "%s: process not in process list (died?).\n", prog_name);
-
+		fprintf(stderr, "%s: process not in process list (died?).\n", progname);
 	printf("%s\n", cmd);
 
 	return 0;
