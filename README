@@ -21,7 +21,9 @@ Notify yourself when your build is done:
 
 	$ after -n gcc -e "build is done!"
 
-Put your machine to sleep after your updates are complete:
+The power of this simple command can be observed when it is piped into other processes.
+
+Put your machine to sleep after your update jobs are complete:
 
 	$ after -p 2027 -e "doas zzz" | sh
 
