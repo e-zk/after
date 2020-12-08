@@ -13,7 +13,8 @@
 void
 usage(char *progname)
 {
-	printf("usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n", progname);
+	printf("usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
+                progname);
 }
 
 int
@@ -63,7 +64,7 @@ main(int argc, char *argv[])
 {
 	int i, ch, entries;
 	int verbose = 0, pid = 0;
-	char *progname = argv[0], 
+	char *progname = argv[0];
 	char *pname = NULL, *cmd = NULL;
 	char errbuf[_POSIX2_LINE_MAX];
 
