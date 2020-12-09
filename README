@@ -1,16 +1,16 @@
 after
 =====
 
-After the specified process dies, echo a string. (OpenBSD only).
+After the specified process dies, echo a string. (OpenBSD specific).
 
 Usage
 -----
 
 	after [-h] [-v] [-p pid | -n process_name] -e string
 
-The process to watch is specified `-p pid' or `-n process_name'.
-After this process dies the string specified by `-e string' will be printed
-to standard output.
+The process to watch is specified `-p pid' or `-n process_name'. After this
+process dies the string specified by `-e string' will be printed to standard
+output.
 
 Examples
 --------
