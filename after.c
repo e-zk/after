@@ -10,12 +10,23 @@
 #include <unistd.h>
 #include <limits.h>
 
+char *progname;
+int verbose;
+
 void
 usage(char *progname)
 {
 	printf("usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
                 progname);
 }
+
+void
+debug_print(const char *message)
+{
+	if (verbose == 1)
+		fprintf(stderr, "%s: %s\n", progname, message);
+}
+
 
 int
 pid_is_in(int pid, struct kinfo_proc **kinfo, int entries)
@@ -63,25 +74,27 @@ int
 main(int argc, char *argv[])
 {
 	int i, ch, entries;
-	int verbose = 0, pid = 0;
-	char *progname = argv[0];
+	int pid = 0;
 	char *pname = NULL, *cmd = NULL;
 	char errbuf[_POSIX2_LINE_MAX];
 
 	kvm_t *kd;
 	struct kinfo_proc **kinfo;
 
+	verbose = 0;
+	progname = argv[0];
+
 	// argument parsing...
-	while((ch = getopt(argc, argv, "hn:p:ve:")) != -1)
+	while((ch = getopt(argc, argv, "e:hn:p:v")) != -1)
 		switch(ch) {
+		case 'e':
+			cmd = optarg;
+			break;
 		case 'n':
 			pname = optarg;
 			break;
 		case 'p':
 			sscanf(optarg, "%d", &pid);
-			break;
-		case 'e':
-			cmd = optarg;
 			break;
 		case 'v':
 			verbose = 1;
@@ -119,22 +132,20 @@ main(int argc, char *argv[])
 	if (pname != NULL) {
 		while(pname_is_in(pname, kinfo, entries) == 0) {
 			kinfo = get_proc_list(kd, &entries);
-			if (verbose == 1)
-				fprintf(stderr, "%s: waiting...\n", progname);
+			debug_print("waiting...");
 			sleep(1);
 		}
 	}
 	else {
 		while(pid_is_in(pid, kinfo, entries) == 0) {
 			kinfo = get_proc_list(kd, &entries);
-			if (verbose == 1)
-				fprintf(stderr, "%s: waiting...\n", progname);
+			debug_print("waiting...");
 			sleep(1);
 		}
 	}
 
-	if (verbose == 1)
-		fprintf(stderr, "%s: process not in process list (died?).\n", progname);
+
+	debug_print("process not in process list (died?).");
 	printf("%s\n", cmd);
 
 	return 0;
