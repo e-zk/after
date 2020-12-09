@@ -119,7 +119,6 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-
 	// initialise virtual memory access
 	kd = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, errbuf);
 	if (kd == NULL)
@@ -128,20 +127,15 @@ main(int argc, char *argv[])
 	// get initial process list
 	kinfo = get_proc_list(kd, &entries);
 
-	// if a process name is given use that, otherwise use pid
-	if (pname != NULL) {
-		while(pname_is_in(pname, kinfo, entries) == 0) {
-			kinfo = get_proc_list(kd, &entries);
-			debug_print("waiting...");
-			sleep(1);
-		}
-	}
-	else {
-		while(pid_is_in(pid, kinfo, entries) == 0) {
-			kinfo = get_proc_list(kd, &entries);
-			debug_print("waiting...");
-			sleep(1);
-		}
+	// if a process name is given use that function, otherwise use pid function
+	while (
+		(pname != NULL) ?
+		pname_is_in(pname, kinfo, entries) == 0 :
+		pid_is_in(pid, kinfo, entries) == 0
+        ) {
+		kinfo = get_proc_list(kd, &entries);
+		debug_print("waiting...");
+		sleep(1);
 	}
 
 
