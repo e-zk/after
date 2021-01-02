@@ -4,11 +4,11 @@
 #include <err.h>
 #include <fcntl.h>
 #include <kvm.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <limits.h>
 
 char *progname;
 int verbose;
@@ -16,7 +16,7 @@ int verbose;
 void
 usage(char *progname)
 {
-	printf("usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
+	fprintf(stderr, "usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
                 progname);
 }
 
@@ -137,7 +137,6 @@ main(int argc, char *argv[])
 		debug_print("waiting...");
 		sleep(1);
 	}
-
 
 	debug_print("process not in process list (died?).");
 	printf("%s\n", cmd);
