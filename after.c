@@ -16,13 +16,13 @@ void
 usage(void)
 {
 	fprintf(stderr, "usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
-                getprogname());
+	        getprogname());
 }
 
 void
 debug_print(const char *message)
 {
-	if (verbose == 1)
+	if (verbose)
 		fprintf(stderr, "%s: %s\n", getprogname(), message);
 }
 
@@ -33,9 +33,9 @@ pid_is_in(int pid, struct kinfo_proc **kinfo, int entries)
 	int i;
 	for (i = 0; i < entries; i++) {
 		if (kinfo[i]->p_pid == pid)
-			return 0;
+			return 1;
 	}
-	return -1;
+	return 0;
 }
 
 int
@@ -44,9 +44,9 @@ pname_is_in(char *pname, struct kinfo_proc **kinfo, int entries)
 	int i;
 	for (i = 0; i < entries; i++) {
 		if (strcmp(kinfo[i]->p_comm, pname) == 0)
-			return 0;
+			return 1;
 	}
-	return -1;
+	return 0;
 }
 
 struct kinfo_proc **
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
 	int i, ch, entries;
 	int pid = 0;
 	int found = 0;
-	char *pname = NULL, *cmd = NULL;
+	char *pname = NULL, *string = NULL;
 	char errbuf[_POSIX2_LINE_MAX];
 
 	kvm_t *kd;
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
 	while((ch = getopt(argc, argv, "e:hn:p:v")) != -1)
 		switch(ch) {
 		case 'e':
-			cmd = optarg;
+			string = optarg;
 			break;
 		case 'n':
 			pname = optarg;
@@ -116,7 +116,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	// show usage if no output string is given
-	if (cmd == NULL) {
+	if (string == NULL) {
 		usage();
 		exit(1);
 	}
@@ -132,9 +132,9 @@ main(int argc, char *argv[])
 	// if a process name is given use that function, otherwise use pid function
 	while (
 		(pname != NULL) ?
-		pname_is_in(pname, kinfo, entries) == 0 :
-		pid_is_in(pid, kinfo, entries) == 0
-        ) {
+		pname_is_in(pname, kinfo, entries) :
+		pid_is_in(pid, kinfo, entries)
+	) {
 		found = 1;
 		kinfo = get_proc_list(kd, &entries);
 		debug_print("waiting...");
@@ -143,10 +143,9 @@ main(int argc, char *argv[])
 
 	if (found) {
 		debug_print("process died.");
-		printf("%s\n", cmd);
+		printf("%s\n", string);
 	} else {
-		debug_print("process not in process list.");
-		exit(1);
+		errx(1, "process not in process list.");
 	}
 
 	return 0;
