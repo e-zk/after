@@ -1,33 +1,33 @@
 AFTER(1)                    General Commands Manual                   AFTER(1)
 
-NNAAMMEE
-     aafftteerr - after process dies echo a string to standard output
+NAME
+     after - after process dies echo a string to standard output
 
-SSYYNNOOPPSSIISS
-     aafftteerr [--hh] [--vv] [--pp _p_i_d | --nn _p_r_o_g_r_a_m___n_a_m_e] --ee _s_t_r_i_n_g
+SYNOPSIS
+     after [-h] [-v] [-p pid | -n program_name] -e string
 
-DDEESSCCRRIIPPTTIIOONN
-     aafftteerr watches the process list for the given _p_i_d or _p_r_o_g_r_a_m___n_a_m_e.  When
-     the process is no longer in the process list aafftteerr outputs --ee _s_t_r_i_n_g to
-     standard output.  If both _p_i_d and _p_r_o_g_r_a_m___n_a_m_e are specified aafftteerr will
-     default to watching the process specified by _p_r_o_g_r_a_m___n_a_m_e.
+DESCRIPTION
+     after watches the process list for the given pid or program_name.  When
+     the process is no longer in the process list after outputs -e string to
+     standard output.  If both pid and program_name are specified after will
+     default to watching the process specified by program_name.
 
-     In the case of using _p_r_o_g_r_a_m___n_a_m_e if there are multiple programs with
-     this name running all of them will have to exit before aafftteerr will echo
-     _s_t_r_i_n_g.
+     In the case of using program_name if there are multiple programs with
+     this name running all of them will have to exit before after will echo
+     string.
 
-OOPPTTIIOONNSS
-     --pp _p_i_d  Watch _p_i_d.
+OPTIONS
+     -p pid  Watch pid.
 
-     --nn _p_r_o_g_r_a_m___n_a_m_e
-             Watch _p_r_o_g_r_a_m___n_a_m_e.
+     -n program_name
+             Watch program_name.
 
-     --hh      Show usage information.
+     -h      Show usage information.
 
-     --vv      Be verbose.
+     -v      Be verbose.
 
-EEXXAAMMPPLLEESS
-     Following are some examples to illustrate how aafftteerr could be useful (or
+EXAMPLES
+     Following are some examples to illustrate how after could be useful (or
      not).
 
      Notify when your compiler has finished running:
@@ -40,7 +40,7 @@ EEXXAAMMPPLLEESS
 
            $ after -p 2027 -e "doas zzz" | sh
 
-SSEEEE AALLSSOO
+SEE ALSO
      kvm_getprocs(3), kvm_open(3)
 
 OpenBSD 6.8                     January 5, 2021                    OpenBSD 6.8
