@@ -13,7 +13,9 @@ installman:V:
 	install -c after.1 ${PREFIX}/man/man1/after.1
 
 clean:V:
-	rm after
+	rm -f after
+	rm -f after.o
+	rm -f after.d
 
 readme:V:
 	mandoc -T ascii | col -bx > README
