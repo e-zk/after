@@ -7,7 +7,10 @@ after: after.c
 	$CC $LDFLAGS $CFLAGS -o after after.c
 
 install:V:
-	install -D -m 0755 after ${PREFIX}/bin/after
+	install -c -s -m 0755 after ${PREFIX}/bin/after
+
+installman:V:
+	install -c after.1 ${PREFIX}/man/man1/after.1
 
 clean:V:
 	rm after
