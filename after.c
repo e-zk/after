@@ -83,6 +83,9 @@ main(int argc, char *argv[])
 
 	verbose = 0;
 
+	if (pledge("stdio ps", NULL) == -1)
+		err(1, "pledge");
+
 	// argument parsing...
 	while((ch = getopt(argc, argv, "e:hn:p:v")) != -1)
 		switch(ch) {
