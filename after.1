@@ -1,0 +1,71 @@
+.Dd $Mdocdate: January 5 2021 $
+.Dt AFTER 1
+.Os
+.Sh NAME
+.Nm after
+.Nd after process dies echo a string to standard output
+.Sh SYNOPSIS
+.Nm after
+.Op Fl h
+.Op Fl v
+.Op Fl p Ar pid | Fl n Ar program_name
+.Fl e Ar string
+.Sh DESCRIPTION
+.Nm
+watches the process list for the given
+.Ar pid
+or
+.Ar program_name .
+When the process is no longer in the process list
+.Nm
+outputs
+.Fl e Ar string
+to standard output.
+If both
+.Ar pid
+and
+.Ar program_name
+are specified
+.Nm
+will default to watching the process specified by
+.Ar program_name .
+
+In the case of using
+.Ar program_name
+if there are multiple programs with this name running all of them will have to
+exit before
+.Nm
+will echo
+.Ar string .
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl p Ar pid
+Watch
+.Ar pid .
+.It Fl n Ar program_name
+Watch
+.Ar program_name .
+.It Fl h
+Show usage information.
+.It Fl v
+Be verbose.
+.Sh EXAMPLES
+
+Following are some examples to illustrate how
+.Nm
+could be useful (or not).
+
+Notify when your compiler has finished running:
+.Bd -literal -offset indent
+$ after -n clang -e "build is finished!"
+.Ed
+.Pp
+The power of this simple tool can be observed when the output is piped into
+other programs. For instance; putting your machine to sleep after your update
+script has finished running:
+.Bd -literal -offset indent
+$ after -p 2027 -e "doas zzz" | sh
+.Ed
+.Sh SEE ALSO
+.Xr kvm_getprocs 3 ,
+.Xr kvm_open 3
