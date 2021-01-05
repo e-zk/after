@@ -14,3 +14,6 @@ installman:V:
 
 clean:V:
 	rm after
+
+readme:V:
+	mandoc -T ascii | col -bx > README
