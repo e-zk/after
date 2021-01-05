@@ -1,7 +1,7 @@
 AFTER(1)                    General Commands Manual                   AFTER(1)
 
 NNAAMMEE
-     aafftteerr – after process dies echo a string to standard output
+     aafftteerr - after process dies echo a string to standard output
 
 SSYYNNOOPPSSIISS
      aafftteerr [--hh] [--vv] [--pp _p_i_d | --nn _p_r_o_g_r_a_m___n_a_m_e] --ee _s_t_r_i_n_g
