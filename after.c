@@ -145,7 +145,7 @@ main(int argc, char *argv[])
 		debug_print("process died.");
 		printf("%s\n", cmd);
 	} else {
-		debug_print("process not in process list.");
+		fprintf(stderr, "%s: process not in process list.\n", getprogname());
 		exit(1);
 	}
 
