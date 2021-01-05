@@ -10,21 +10,20 @@
 #include <string.h>
 #include <unistd.h>
 
-char *progname;
 int verbose;
 
 void
-usage(char *progname)
+usage(void)
 {
 	fprintf(stderr, "usage: %s [-h] [-v] [-p pid | -n process_name] -e string\n",
-                progname);
+                getprogname());
 }
 
 void
 debug_print(const char *message)
 {
 	if (verbose == 1)
-		fprintf(stderr, "%s: %s\n", progname, message);
+		fprintf(stderr, "%s: %s\n", getprogname(), message);
 }
 
 
@@ -82,7 +81,6 @@ main(int argc, char *argv[])
 	struct kinfo_proc **kinfo;
 
 	verbose = 0;
-	progname = argv[0];
 
 	// argument parsing...
 	while((ch = getopt(argc, argv, "e:hn:p:v")) != -1)
@@ -100,22 +98,22 @@ main(int argc, char *argv[])
 			verbose = 1;
 			break;
 		case 'h':
-			usage(progname);
+			usage();
 			return 0;
 		default:
-			usage(progname);
+			usage();
 			exit(1);
 		}
 
 	// argument checking...
 	// show usage if neither a pid nor a pname are given
 	if (!(pname != NULL || pid != 0)) {
-		usage(progname);
+		usage();
 		exit(1);
 	}
 	// show usage if no output string is given
 	if (cmd == NULL) {
-		usage(progname);
+		usage();
 		exit(1);
 	}
 
