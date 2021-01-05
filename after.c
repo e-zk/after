@@ -74,6 +74,7 @@ main(int argc, char *argv[])
 {
 	int i, ch, entries;
 	int pid = 0;
+	int found = 0;
 	char *pname = NULL, *cmd = NULL;
 	char errbuf[_POSIX2_LINE_MAX];
 
@@ -131,13 +132,19 @@ main(int argc, char *argv[])
 		pname_is_in(pname, kinfo, entries) == 0 :
 		pid_is_in(pid, kinfo, entries) == 0
         ) {
+		found = 1;
 		kinfo = get_proc_list(kd, &entries);
 		debug_print("waiting...");
 		sleep(1);
 	}
 
-	debug_print("process not in process list (died?).");
-	printf("%s\n", cmd);
+	if (found) {
+		debug_print("process died.");
+		printf("%s\n", cmd);
+	} else {
+		debug_print("process not in process list.");
+		exit(1);
+	}
 
 	return 0;
 }
