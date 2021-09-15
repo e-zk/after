@@ -49,28 +49,25 @@ pname_is_in(char *pname, struct kinfo_proc **kinfo, int entries)
 	return 0;
 }
 
-struct kinfo_proc **
-get_proc_list(kvm_t *kd, int *entries)
+void
+update_proc_list(struct kinfo_proc ***kinfo, kvm_t *kd, int *entries)
 {
 	int i;
-	struct kinfo_proc *kp, **kinfo;
+	struct kinfo_proc *kp;
 
-	// get proc list
 	kp = kvm_getprocs(kd, KERN_PROC_ALL, 0, sizeof(*kp), entries);
 	if (kp == NULL)
 		errx(1, "%s", kvm_geterr(kd));
 
-	// this may not be necessary since we are not sorting our array at any point
-	if ((kinfo = reallocarray(NULL, *entries, sizeof(*kinfo))) == NULL)
+	if (((*kinfo) = reallocarray((*kinfo), *entries, sizeof(*(*kinfo)))) == NULL)
 		err(1, "failed to allocate memory for proc pointers");
-	for (i = 0; i < *entries; i++)
-		kinfo[i] = &kp[i];
 
-	return kinfo;
+	for (i = 0; i < *entries; i++)
+		(*kinfo)[i] = &kp[i];
 }
 
 int
-main(int argc, char *argv[])
+main(int argc, char **argv)
 {
 	int i, ch, entries;
 	int pid = 0;
@@ -79,7 +76,7 @@ main(int argc, char *argv[])
 	char errbuf[_POSIX2_LINE_MAX];
 
 	kvm_t *kd;
-	struct kinfo_proc **kinfo;
+	struct kinfo_proc **kinfo = NULL;
 
 	verbose = 0;
 
@@ -127,20 +124,28 @@ main(int argc, char *argv[])
 		errx(1, "%s", errbuf);
 
 	// get initial process list
-	kinfo = get_proc_list(kd, &entries);
+	update_proc_list(&kinfo, kd, &entries);
 
 	// if a process name is given use that function, otherwise use pid function
 	while (
-		(pname != NULL) ?
-		pname_is_in(pname, kinfo, entries) :
-		pid_is_in(pid, kinfo, entries)
+		(pname != NULL)
+		? pname_is_in(pname, kinfo, entries)
+		: pid_is_in(pid, kinfo, entries)
 	) {
-		found = 1;
-		kinfo = get_proc_list(kd, &entries);
+		found = 1; // mark the process as existing
+		update_proc_list(&kinfo, kd, &entries);
 		debug_print("waiting...");
 		sleep(1);
 	}
 
+	// free kinfo and close off access to kernel vmem
+	free(kinfo);
+	int kd_error;
+	if ((kd_error = kvm_close(kd)) < 0) {
+		errx(1, "failed to close kernel memory descriptor (%d)", kd_error);
+	}
+
+	// if the process existed at some stage
 	if (found) {
 		debug_print("process died.");
 		printf("%s\n", string);
